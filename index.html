@@ -14,27 +14,40 @@
             margin: 0;
             font-family: Arial, sans-serif;
         }
-        #camera {
+        #camera, #captured-photo {
             width: 100%;
             max-width: 400px;
         }
         #canvas {
             display: none;
         }
+        #buttons {
+            margin-top: 10px;
+        }
+        #buttons button {
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
     <h1>Camera Capture</h1>
     <video id="camera" autoplay></video>
-    <button id="capture">Take Photo</button>
+    <img id="captured-photo" style="display:none;">
     <canvas id="canvas"></canvas>
-    <a id="download" style="display:none;">Download Photo</a>
+
+    <div id="buttons">
+        <button id="capture">Take Photo</button>
+        <button id="retry" style="display:none;">Retry</button>
+        <button id="save" style="display:none;">Save Photo</button>
+    </div>
 
     <script>
         const video = document.getElementById('camera');
         const canvas = document.getElementById('canvas');
+        const capturedPhoto = document.getElementById('captured-photo');
         const captureButton = document.getElementById('capture');
-        const downloadLink = document.getElementById('download');
+        const retryButton = document.getElementById('retry');
+        const saveButton = document.getElementById('save');
         const context = canvas.getContext('2d');
 
         // Get access to the camera
@@ -61,11 +74,38 @@
             // Convert the canvas to a data URL
             const dataURL = canvas.toDataURL('image/png');
 
-            // Create a link to download the photo
-            downloadLink.href = dataURL;
-            downloadLink.download = 'photo.png';
-            downloadLink.textContent = 'Download Photo';
-            downloadLink.style.display = 'block';
+            // Display the captured photo
+            capturedPhoto.src = dataURL;
+            capturedPhoto.style.display = 'block';
+
+            // Hide the video and capture button
+            video.style.display = 'none';
+            captureButton.style.display = 'none';
+
+            // Show retry and save buttons
+            retryButton.style.display = 'inline';
+            saveButton.style.display = 'inline';
+        });
+
+        // Retry capturing a photo
+        retryButton.addEventListener('click', () => {
+            // Hide the captured photo and retry/save buttons
+            capturedPhoto.style.display = 'none';
+            retryButton.style.display = 'none';
+            saveButton.style.display = 'none';
+
+            // Show the video and capture button
+            video.style.display = 'block';
+            captureButton.style.display = 'inline';
+        });
+
+        // Save the captured photo
+        saveButton.addEventListener('click', () => {
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'photo.png';
+            link.click();
         });
     </script>
 </body>
