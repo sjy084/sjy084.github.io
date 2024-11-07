@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Capture</title>
+    <style>
+        #camera {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: block;
+        }
+        #canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Capture</h1>
+    <video id="camera" autoplay></video>
+    <button id="capture">Take Photo</button>
+    <canvas id="canvas"></canvas>
+    <a id="download" style="display:none;">Download Photo</a>
 
+    <script>
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const downloadLink = document.getElementById('download');
+        const context = canvas.getContext('2d');
+
+        // Get access to the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing the camera: ", err);
+            });
+
+        // Capture a photo
+        captureButton.addEventListener('click', () => {
+            const width = video.videoWidth;
+            const height = video.videoHeight;
+
+            // Set canvas dimensions
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, width, height);
+
+            // Convert the canvas to a data URL
+            const dataURL = canvas.toDataURL('image/png');
+
+            // Create a link to download the photo
+            downloadLink.href = dataURL;
+            downloadLink.download = 'photo.png';
+            downloadLink.textContent = 'Download Photo';
+            downloadLink.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
